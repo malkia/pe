@@ -1,0 +1,5 @@
+[package]
+
+name = "pe-rust"
+version = "0.0.1"
+authors = ["Dimiter 'malkia' Stanev <malkia@gmail.com>"]
