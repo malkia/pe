@@ -1,3 +1,33 @@
+mod misc {
+    use std::collections::{BitvSet, Bitv};
+    use std::iter;
+    // http://doc.rust-lang.org/collections/bitv/
+    pub fn prime_sieve( max_prime : uint ) -> BitvSet {
+        // Assume all numbers are prime to begin, and then we
+        // cross off non-primes progressively
+        let mut bv = Bitv::with_capacity(max_prime, true);
+
+        // Neither 0 nor 1 are prime
+        bv.set(0, false);
+        bv.set(1, false);
+
+        let max = (max_prime as f64).sqrt() as uint;
+
+        for i in iter::range_inclusive(2, (max_prime as f64).sqrt() as uint) {
+            // if i is a prime
+            if bv[i] {
+                // Mark all multiples of i as non-prime
+                // (any multiples below i * i
+                // will have been marked as non-prime previously)
+                for j in iter::range_step(i * i, max_prime, i) { 
+                    bv.set(j, false) 
+                }
+            }
+        }
+        BitvSet::from_bitv(bv)    
+    }
+}
+
 // Problem 1: Multiples of 3 and 5
 //   If we list all the natural numbers below 10 that are multiples of 
 //   3 or 5, we get 3, 5, 6 and 9. The sum of these multiples is 23.
@@ -39,8 +69,27 @@ fn calc_pe2( limit : int ) -> int {
     sum
 }
 
+// Problem 3: Largest prime factor
+// The prime factors of 13195 are 5, 7, 13 and 29.
+// What is the largest prime factor of the number 600851475143 ?
+#[test]
+fn test_pe3() { assert!(exec_pe3()==6857) }
+fn exec_pe3() -> u64 { calc_pe3( 600_851_475_143 ) }
+fn calc_pe3( number : u64 ) -> u64 {
+    let n = (number as f64).sqrt() as u64;
+    let mut max_factor = 0u64;
+    let primes = misc::prime_sieve(n as uint);
+    for factor in primes.iter() {
+        if number % (factor as u64) == 0 {
+            max_factor = (factor as u64)
+        }
+    }
+    max_factor
+}
+
 #[cfg(not(test))]
 fn main() {
-    println!("exec_pe1()={}", exec_pe1());
-    println!("exec_pe2()={}", exec_pe2());
+    println!("001: {}", exec_pe1());
+    println!("002: {}", exec_pe2());
+    println!("003: {}", exec_pe3());
 }
